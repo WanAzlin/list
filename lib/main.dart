@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -10,115 +13,133 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          if (constraints.maxWidth > 600) {
-            return const DesktopApp();
-          }
-          return const MobileApp();
-        },
-      ),
+    // if (Platform.isIOS || Platform.isMacOS) {
+    //   return const AndroidLayout();
+    // }
+    return const IosLayout();
+  }
+}
+
+class IosLayout extends StatelessWidget {
+  const IosLayout({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const CupertinoApp(
+      theme: CupertinoThemeData(brightness: Brightness.light),
+      home: TabScaffoldExample(),
     );
   }
 }
 
-class DesktopApp extends StatelessWidget {
-  const DesktopApp({super.key});
+class AndroidLayout extends StatelessWidget {
+  const AndroidLayout({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        backgroundColor: Colors.indigo.shade500,
-        appBar: AppBar(
-          title: const Text('Komponen UI flutter-Dekstop'),
-        ),
-        body: Row(
-          children: [
-            Expanded(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(
-                      10.0,
-                    ),
-                    child: AspectRatio(
-                      aspectRatio: 16 / 9,
-                      child: Container(
-                        color: Colors.indigo.shade400,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: 8,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Container(
-                            color: Colors.indigo.shade400,
-                            height: 120,
-                          ),
-                        );
-                      },
-                    ),
-                  )
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Container(
-                color: Colors.indigo.shade400,
-                width: 200,
-              ),
-            ),
-          ],
-        ));
+    return const MaterialApp();
   }
 }
 
-class MobileApp extends StatelessWidget {
-  const MobileApp({super.key});
+class TabScaffoldExample extends StatefulWidget {
+  const TabScaffoldExample({super.key});
 
   @override
+  State<TabScaffoldExample> createState() => _TabScaffoldExampleState();
+}
+
+class _TabScaffoldExampleState extends State<TabScaffoldExample> {
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.green.shade500,
-      appBar: AppBar(
-        title: const Text('Komponen UI flutter-Mobile'),
+    return CupertinoTabScaffold(
+      tabBar: CupertinoTabBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.search_circle_fill),
+            label: 'Explore',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.person),
+            label: 'User',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.settings),
+            label: 'Settings',
+          ),
+        ],
       ),
-      body: Expanded(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(
-                10.0,
+      tabBuilder: (BuildContext context, int index) {
+
+        if (index == 2) {
+          return CupertinoTabView(
+            builder: (BuildContext context) {
+              return const CupertinoPageScaffold(
+                navigationBar: CupertinoNavigationBar(
+                  middle: Text('User'),
+                ),
+                child: Center(
+                  child: Text('User Page'),
+                ),
+              );
+            },
+          );
+        }
+
+        if (index == 3) {
+          return CupertinoTabView(
+            builder: (BuildContext context) {
+              return const CupertinoPageScaffold(
+                navigationBar: CupertinoNavigationBar(
+                  middle: Text('Settings'),
+                ),
+                child: Center(
+                  child: Text('Settings Page'),
+                ),
+              );
+            },
+          );
+        }
+
+        return CupertinoTabView(
+          builder: (BuildContext context) {
+            return CupertinoPageScaffold(
+              navigationBar: CupertinoNavigationBar(
+                middle: Text('Page 1 of tab $index'),
               ),
-              child: AspectRatio(
-                aspectRatio: 16 / 9,
-                child: Container(
-                  color: Colors.green.shade400,
+              child: Center(
+                child: CupertinoButton(
+                  child: const Text('Next page'),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      CupertinoPageRoute<void>(
+                        builder: (BuildContext context) {
+                          return CupertinoPageScaffold(
+                            navigationBar: CupertinoNavigationBar(
+                              middle: Text('Page 2 of tab $index'),
+                            ),
+                            child: Center(
+                              child: CupertinoButton(
+                                child: const Text('Back'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
                 ),
               ),
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: 8,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Container(
-                      color: Colors.green.shade400,
-                      height: 120,
-                    ),
-                  );
-                },
-              ),
-            )
-          ],
-        ),
-      ),
+            );
+          },
+        );
+      },
     );
   }
 }
